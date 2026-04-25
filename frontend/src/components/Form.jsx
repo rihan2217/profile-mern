@@ -3,7 +3,12 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 function Form() {
-  const [form, setform] = useState({ username: "", email: "", image: "" });
+  const [form, setform] = useState({
+    username: "",
+    email: "",
+    password: "",
+    image: "",
+  });
   const navigate = useNavigate();
 
   function handlechange(e) {
@@ -16,7 +21,7 @@ function Form() {
     e.preventDefault();
 
     // ✅ validation
-    if (!form.username || !form.email || !form.image) {
+    if (!form.username || !form.email || !form.password || !form.image) {
       alert("Please fill all fields!");
       return;
     }
@@ -25,7 +30,9 @@ function Form() {
     if (loading) return;
     setLoading(true);
 
-    await axios.post("/api/create", form);
+    await axios.post("/api/create", form, {
+      withCredentials: true,
+    });
     setLoading(false);
     navigate("/read");
   };
@@ -58,6 +65,16 @@ function Form() {
             />
           </div>
           <div className="p-2 flex gap-4 ">
+            <label className="w-1/3">Enter Your Password</label>
+            <input
+              className="p-2 w-2/3 text-black bg-white"
+              type="password"
+              placeholder="enter your password"
+              name="password"
+              onChange={handlechange}
+            />
+          </div>
+          <div className="p-2 flex gap-4 ">
             <label className="w-1/3">Enter Your image url</label>
             <input
               className="p-2 w-2/3 text-black bg-white"
@@ -76,7 +93,14 @@ function Form() {
               {loading ? "Creating..." : "Create data"}
             </button>
             <button
-              type="button"   
+              type="button"
+              onClick={() => navigate("/login")}
+              className="mt-4 p-2 rounded bg-gray-600 text-white"
+            >
+              Already have account? Login
+            </button>
+            <button
+              type="button"
               className="mt-4 p-2 rounded bg-green-600 text-white"
               onClick={() => navigate("/read")}
             >
