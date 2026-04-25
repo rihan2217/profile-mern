@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import Form from './components/form'
+import Form from './components/Form'
 import Read from './components/Read'
 import Edit from './components/Edit'
 import { Route, Routes } from 'react-router-dom'
