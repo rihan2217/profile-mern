@@ -35,7 +35,7 @@ function Form() {
       <h1 className=" p-4 bg-green-500 text-white text-3xl font-bold m-4">
         helloo gouyssss
       </h1>
-      <div className="p-2 border-2 bg-gray-950 text-light-gray w-[40vw] h-[40vh] rounded">
+      <div className="p-2 m-4 border-2 bg-gray-950 text-light-gray min-w-[40vw] min-h-[40vh] rounded">
         <form onSubmit={handlesubmit}>
           <div className="p-2 flex gap-4 justify-evenly ">
             <label className="w-1/3">Enter Your Username</label>
@@ -76,6 +76,7 @@ function Form() {
               {loading ? "Creating..." : "Create data"}
             </button>
             <button
+              type="button"   
               className="mt-4 p-2 rounded bg-green-600 text-white"
               onClick={() => navigate("/read")}
             >
