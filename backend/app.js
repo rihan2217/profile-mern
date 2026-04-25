@@ -128,6 +128,7 @@ app.get('/api/delete/:id',isLoggedIn, async (req,res)=>{
     const user = await UserModel.findOneAndDelete(
         req.params.id
     );
+     res.clearCookie('token');  
     res.json({message: 'deleted'})
 })
 
