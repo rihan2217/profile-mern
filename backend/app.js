@@ -50,7 +50,7 @@ app.post('/api/create',async (req,res)=>{
 
 // ✅ MIDDLEWARE - protect routes
 function isLoggedIn(req,res,next){
-    const token = res.cookies.token;
+    const token = req.cookies.token;
     if(!token) return res.status(401).json({ message: "Not logged in "});
 
     try{
