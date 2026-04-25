@@ -4,25 +4,24 @@ import { useNavigate } from "react-router-dom";
 
 function Read() {
   const [users, setUsers] = useState([]);
-  const [check, setcheck] = useState(false)
+  const [currentUser, setCurrentUser] = useState(null); 
   const navigate = useNavigate();
+
 
   useEffect(() => {
     axios.get("/api/read").then((res) => setUsers(res.data));
+
+    axios.get("/api/me", { withCredentials: true })
+      .then((res) => setCurrentUser(res.data.user))
+      .catch(() => setCurrentUser(null));
   }, []);
 
-  const handleDelete = async (id) => {   
+    const handleDelete = async (id) => {
     try {
         await axios.get(`/api/delete/${id}`, {
             withCredentials: true
         });
-        
-        // if deleting own profile → logout and go to register
-        if(id === currentUser?.id) {
-            navigate('/');
-        } else {
-            setUsers(users.filter((u) => u._id !== id));
-        }
+        navigate('/');  // ← always go to register after delete
     } catch(err) {
         alert(err.response?.data?.message || "Cannot delete this profile");
     }
@@ -45,15 +44,20 @@ function Read() {
             <img src={`${user.image}`} className="w-48 h-48 object-cover rounded-full mb-4 " />
             <h1 className="text-xl font-semibold mb-1">{user.username}</h1>
             <h2 className="text-gray-300 mb-4">{user.email}</h2>
-            <div className="flex gap-4">
-              <button className="px-3 py-1 bg-blue-500 rounded-md hover:bg-blue-600 transition" 
-              onClick={() => navigate(`/edit/${user._id}`)}>Update Profile
-              </button>
-              <button className="px-3 py-1 bg-red-500 rounded-md hover:bg-red-600 transition"
-              onClick={()=>{handleDelete(user._id)}}>
-                delete Profile
-              </button>
-            </div>
+            {currentUser && currentUser.id === user._id && (
+                <div className="flex gap-4">
+                  <button 
+                    className="px-3 py-1 bg-blue-500 rounded-md hover:bg-blue-600 transition"
+                    onClick={() => navigate(`/edit/${user._id}`)}>
+                    Update Profile
+                  </button>
+                  <button 
+                    className="px-3 py-1 bg-red-500 rounded-md hover:bg-red-600 transition"
+                    onClick={() => handleDelete(user._id)}>
+                    Delete Profile
+                  </button>
+                </div>
+              )}
           </div>
           )):(
           <p className="text-2xl text-white">loading ... </p>
