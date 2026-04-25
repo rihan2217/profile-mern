@@ -11,11 +11,21 @@ function Read() {
     axios.get("/api/read").then((res) => setUsers(res.data));
   }, []);
 
-  const handleDelete = async (id) => {
-    await axios.get(`/api/delete/${id}`,{
-      withCredentials: true
-    });
-    setUsers(users.filter((u) => u._id !== id)); // remove from UI instantly
+  const handleDelete = async (id) => {   
+    try {
+        await axios.get(`/api/delete/${id}`, {
+            withCredentials: true
+        });
+        
+        // if deleting own profile → logout and go to register
+        if(id === currentUser?.id) {
+            navigate('/');
+        } else {
+            setUsers(users.filter((u) => u._id !== id));
+        }
+    } catch(err) {
+        alert(err.response?.data?.message || "Cannot delete this profile");
+    }
   };
 
   return (
