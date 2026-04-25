@@ -43,7 +43,7 @@ function Read() {
         </button>
         <button
             type="button"
-            className="px-3 py-1 bg-yellow-500 rounded-md hover:bg-yellow-600 transition"
+            className="px-3 py-1 mt-4 bg-yellow-500 rounded-md hover:bg-yellow-600 transition"
             onClick={handleLogout}
         >
             Logout
