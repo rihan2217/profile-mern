@@ -15,7 +15,9 @@ function Edit() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    await axios.post(`/api/update/${id}`, form)
+    await axios.post(`/api/update/${id}`, form,{
+        withCredentials: true  
+    })
     navigate('/read')
   }
 

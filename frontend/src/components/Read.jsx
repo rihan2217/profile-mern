@@ -12,7 +12,9 @@ function Read() {
   }, []);
 
   const handleDelete = async (id) => {
-    await axios.get(`/api/delete/${id}`);
+    await axios.get(`/api/delete/${id}`,{
+      withCredentials: true
+    });
     setUsers(users.filter((u) => u._id !== id)); // remove from UI instantly
   };
 
