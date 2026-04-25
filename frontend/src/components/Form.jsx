@@ -1,6 +1,6 @@
-import { useState } from 'react'
-import axios from 'axios'
-import { useNavigate } from 'react-router-dom'
+import { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 function Form() {
   const [form, setform] = useState({ username: "", email: "", image: "" });
@@ -10,9 +10,23 @@ function Form() {
     setform({ ...form, [e.target.name]: e.target.value });
   }
 
+  const [loading, setLoading] = useState(false);
+
   const handlesubmit = async (e) => {
     e.preventDefault();
+
+    // ✅ validation
+    if (!form.username || !form.email || !form.image) {
+      alert("Please fill all fields!");
+      return;
+    }
+
+    // ✅ prevent double submit
+    if (loading) return;
+    setLoading(true);
+
     await axios.post("/api/create", form);
+    setLoading(false);
     navigate("/read");
   };
 
@@ -54,10 +68,18 @@ function Form() {
             />
           </div>
           <div className="m-2 flex gap-4 ">
-            <button type="submit" className="mt-4 p-2 rounded bg-green-600 text-white">
-              Create data
+            <button
+              type="submit"
+              disabled={loading}
+              className="mt-4 p-2 rounded bg-green-600 text-white disabled:opacity-50"
+            >
+              {loading ? "Creating..." : "Create data"}
             </button>
-            <button className="mt-4 p-2 rounded bg-green-600 text-white"onClick={() => navigate('/read')}>read profile
+            <button
+              className="mt-4 p-2 rounded bg-green-600 text-white"
+              onClick={() => navigate("/read")}
+            >
+              read profile
             </button>
           </div>
         </form>
