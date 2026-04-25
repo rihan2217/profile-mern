@@ -27,6 +27,11 @@ function Read() {
     }
   };
 
+  const handleLogout = async () => {
+    await axios.get("/api/logout", { withCredentials: true });
+    navigate('/login');
+  }
+
   return (
     <>
       <div className="bg-gray-800 text-gray-300 min-h-screen flex flex-col items-center p-6">
@@ -35,6 +40,13 @@ function Read() {
         </h1>
         <button className="px-3 py-1 bg-red-500 rounded-md hover:bg-red-600 transition">
           <a href="/">back to form</a>
+        </button>
+        <button
+            type="button"
+            className="px-3 py-1 bg-yellow-500 rounded-md hover:bg-yellow-600 transition"
+            onClick={handleLogout}
+        >
+            Logout
         </button>
         <div className="grid m-2 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 w-full max-w-6xl">
          

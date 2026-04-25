@@ -132,4 +132,9 @@ app.get('/api/delete/:id',isLoggedIn, async (req,res)=>{
     res.json({message: 'deleted'})
 })
 
+app.get('/api/logout', (req, res) => {
+    res.clearCookie('token');
+    res.json({ message: "Logged out" });
+});
+
 app.listen(3000,()=>console.log("server running on port 3000"));
