@@ -16,7 +16,7 @@ function CreatePost() {
     e.preventDefault();
     setError("");
 
-    if (!form.content || !form.image) {
+    if (!form.content && !form.image) {
       setError("Please fill all fields!");
       return;
     }
