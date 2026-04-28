@@ -2,7 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-function Login() {
+function CreatePost() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -16,7 +16,7 @@ function Login() {
     e.preventDefault();
     setError("");
 
-    if (!form.email || !form.password) {
+    if (!form.content || !form.image) {
       setError("Please fill all fields!");
       return;
     }
@@ -25,7 +25,7 @@ function Login() {
     setLoading(true);
 
     try {
-      await axios.post("/api/login", form, {
+      await axios.post("/api/CreatePost", form, {
         withCredentials: true,  // ← important! sends cookies
       });
       navigate("/profile");
@@ -39,7 +39,7 @@ function Login() {
   return (
     <div className="h-screen bg-gray-800 text-gray-300 flex flex-col items-center justify-center">
       <h1 className="p-4 bg-green-500 text-white text-3xl font-bold m-4">
-        Login
+        Create Posts
       </h1>
       <div className="p-2 m-4 border-2 bg-gray-950 text-light-gray min-w-[40vw] rounded">
         <form onSubmit={handlesubmit}>
@@ -49,23 +49,23 @@ function Login() {
           )}
 
           <div className="p-2 flex gap-4">
-            <label className="w-1/3">Email</label>
-            <input
+            <label className="w-1/3">Write your post</label>
+            <textarea
               className="p-2 w-2/3 text-black bg-white"
-              type="email"
-              placeholder="enter your email"
-              name="email"
+              type="text"
+              placeholder="enter your content"
+              name="content"
               onChange={handlechange}
-            />
+            ></textarea>
           </div>
 
           <div className="p-2 flex gap-4">
-            <label className="w-1/3">Password</label>
+            <label className="w-1/3">Image Post</label>
             <input
               className="p-2 w-2/3 text-black bg-white"
-              type="password"
-              placeholder="enter your password"
-              name="password"
+              type="text"
+              placeholder="enter your image"
+              name="image"
               onChange={handlechange}
             />
           </div>
@@ -76,14 +76,14 @@ function Login() {
               disabled={loading}
               className="mt-4 p-2 rounded bg-green-600 text-white disabled:opacity-50"
             >
-              {loading ? "Logging in..." : "Login"}
+              {loading ? "Creating..." : "Create data"}
             </button>
             <button
               type="button"
-              onClick={() => navigate("/")}
-              className="mt-4 p-2 rounded bg-gray-600 text-white"
+              onClick={() => navigate("/read")}
+              className="mt-4 p-2 rounded bg-green-600 text-white"
             >
-              Register instead
+              Read Post
             </button>
           </div>
 
@@ -93,4 +93,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default CreatePost;

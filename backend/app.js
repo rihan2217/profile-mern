@@ -6,11 +6,11 @@ const UserModel = require('./usermodel');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
-const usermodel = require('./usermodel');
+const PostModel = require('./postmodel');
 
 const app = express();
 
-app.use(cors({ origin: 'https://profile-mern-ten.vercel.app/', credentials: true }));
+app.use(cors({ origin: 'profile-mern-ten.vercel.app', credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 app.use(cookieParser());
@@ -23,11 +23,11 @@ mongoose.connect(process.env.MONGO_URI)
 app.post('/api/create',async (req,res)=>{
     const {username,email,password,image} = req.body;
 
-    const existing = await usermodel.findOne({email});
+    const existing = await UserModel.findOne({email});
     if(existing) return res.status(400).json({message :"email already exist"});
     
     // hash password
-   const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await UserModel.create({
             username,
@@ -63,6 +63,7 @@ function isLoggedIn(req,res,next){
 }
 
 
+
 app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
     
@@ -93,6 +94,16 @@ app.post('/api/login', async (req, res) => {
 
 app.get('/api/me', isLoggedIn, (req, res) => {
     res.json({ user: req.user });
+});
+
+app.get('/api/profile', isLoggedIn, async (req, res) => {
+  try {
+    const user = await UserModel.findById(req.user.id).populate('post'); // ✅ use 'post'
+    
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 });
 
 app.get('/api/read',async (req,res)=>{
@@ -136,5 +147,107 @@ app.get('/api/logout', (req, res) => {
     res.clearCookie('token');
     res.json({ message: "Logged out" });
 });
+
+
+//post data update create delete read 
+
+
+app.post('/api/CreatePost', isLoggedIn, async (req, res) => {
+  try {
+    const { content, image } = req.body;
+
+    if (!content || !image) {
+      return res.status(400).json({ message: 'Content or image is required' });
+    }
+
+    const post = await PostModel.create({
+      content,
+      image,
+      user: req.user.id,  // ✅ use .id (your token stores 'id' not '_id')
+    });
+
+    await UserModel.findByIdAndUpdate(
+      req.user.id,
+      { $push: { post: post._id } }  // ✅ cleaner than find + push + save
+    );
+
+    res.status(201).json({ message: 'Post created', post });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message }); // ✅ see exact error
+  }
+});
+
+app.get('/api/posts', async (req, res) => {
+  try {
+    const posts = await PostModel.find()
+      .populate('user', 'username image') // ✅ get author info
+      .sort({ createdAt: -1 });           // ✅ newest first
+    res.json(posts);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+app.get('/api/user/:id', async (req, res) => {
+  try {
+    const user = await UserModel.findById(req.params.id).populate('post');
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+app.delete('/api/post/:id', isLoggedIn, async (req, res) => {
+  try {
+    const post = await PostModel.findById(req.params.id);
+    if (!post) return res.status(404).json({ message: 'Post not found' });
+
+    // ✅ only owner can delete
+    if (post.user.toString() !== req.user.id) {
+      return res.status(403).json({ message: 'Not your post' });
+    }
+
+    await PostModel.findByIdAndDelete(req.params.id);
+
+    // ✅ remove from user's post array too
+    await UserModel.findByIdAndUpdate(req.user.id, {
+      $pull: { post: req.params.id }
+    });
+
+    res.json({ message: 'Post deleted' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+
+app.post('/api/post/like/:id', isLoggedIn, async (req, res) => {
+  try {
+    const post = await PostModel.findById(req.params.id);
+    if (!post) return res.status(404).json({ message: 'Post not found' });
+
+    const alreadyLiked = post.likes.includes(req.user.id);
+
+    if (alreadyLiked) {
+      // unlike
+      await PostModel.findByIdAndUpdate(req.params.id, {
+        $pull: { likes: req.user.id }
+      });
+      return res.json({ message: 'Unliked' });
+    } else {
+      // like
+      await PostModel.findByIdAndUpdate(req.params.id, {
+        $addToSet: { likes: req.user.id }
+      });
+      return res.json({ message: 'Liked' });
+    }
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 
 app.listen(3000,()=>console.log("server running on port 3000"));

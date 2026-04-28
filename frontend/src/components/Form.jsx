@@ -34,7 +34,7 @@ function Form() {
       withCredentials: true,
     });
     setLoading(false);
-    navigate("/read");
+    navigate("/profile");
   };
 
   return (
