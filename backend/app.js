@@ -156,7 +156,7 @@ app.post('/api/CreatePost', isLoggedIn, async (req, res) => {
   try {
     const { content, image } = req.body;
 
-    if (!content || !image) {
+    if (!content && !image) {
       return res.status(400).json({ message: 'Content or image is required' });
     }
 
